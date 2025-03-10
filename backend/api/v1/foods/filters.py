@@ -15,7 +15,7 @@ class RecipeFilter(filters_dj.FilterSet):
         tags = self.request.query_params.getlist(name)
         return queryset.filter(tags__slug__in=tags).distinct()
 
-    def filter_is_favorited(self, queryset, name, value):
+    def filter_is_favorited(self, queryset, name, value): # подумать как объединить методы
         user = self.request.user
         if user.is_authenticated and value:
             return queryset.filter(favorites__user=user)

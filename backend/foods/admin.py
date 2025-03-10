@@ -31,6 +31,7 @@ class IngredientAdmin(admin.ModelAdmin):
     # inlines = (
     #     TitleInline,
     # )
+    
     list_display = (
         'name',
         'measurement_unit'

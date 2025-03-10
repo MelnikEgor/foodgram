@@ -29,9 +29,6 @@ class UserAdmin(BaseUserAdmin):
 
 @admin.register(Follow)
 class FollowAdmin(admin.ModelAdmin):
-    # inlines = (
-    #     TitleInline,
-    # )
     list_display = (
         'user',
         'following'

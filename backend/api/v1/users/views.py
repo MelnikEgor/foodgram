@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
-from djoser import views as djoser_views
-from rest_framework import status
+# from djoser import views as djoser_views
+from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -20,14 +20,14 @@ User = get_user_model()
 
 
 class UserViewSet(
-    djoser_views.UserViewSet,
+    # djoser_views.UserViewSet,
     # djoser_views.generics.CreateAPIView,
     # djoser_views.generics.RetrieveAPIView,
     # djoser_views.generics.ListAPIView,
-    # mixins.CreateModelMixin,
-    # mixins.ListModelMixin,
-    # mixins.RetrieveModelMixin,
-    # viewsets.GenericViewSet
+    mixins.CreateModelMixin,
+    mixins.ListModelMixin,
+    mixins.RetrieveModelMixin,
+    viewsets.GenericViewSet
 ):
     """Представление пользователя."""
 
@@ -39,21 +39,27 @@ class UserViewSet(
             return UserWriteSerializer
         return UserReadSerializer
 
-    def get_permissions(self):
-        if self.action == "me":
-            self.permission_classes = [IsAuthenticated]
-        return super().get_permissions()
+    # def get_permissions(self):
+    #     if self.action == "me":
+    #         self.permission_classes = [IsAuthenticated]
+    #     return super().get_permissions()
 
-    # @action(
-    #     detail=False,
-    #     methods=['GET'],
-    #     permission_classes=(IsAuthenticated, ),
-    #     url_path='me'
-    # )
-    # def me(self, request):
-    #     serializer = UserReadSerializer(request.user, data=request.data)
-    #     serializer.is_valid(raise_exception=True)
-    #     return Response(serializer.data)
+    @action(
+        detail=False,
+        methods=['GET'],
+        permission_classes=(IsAuthenticated, ),
+        url_path='me'
+    )
+    def me(self, request):
+        """Получить свою страницу."""
+
+        serializer = UserReadSerializer(
+            request.user,
+            data=request.data,
+            context={'request': request}
+        )
+        serializer.is_valid(raise_exception=True)
+        return Response(serializer.data)
 
     @action(
         detail=False,
@@ -71,17 +77,8 @@ class UserViewSet(
         )
 
         if serializer.is_valid(raise_exception=True):
-            # print('#'*60, serializer.data, "#"* 60)
-            # print('*'*60, serializer.validated_data, "*"* 60)
-            # user.avatar = serializer.validated_data['avatar']
-            # user = User.objects.filter(username=request.user) #get_object_or_404(
-            #     User, username=request.user
-            # )  # 
-          #  print('*'*60, user, "*"* 60)
             user.avatar = serializer.validated_data['avatar']
             user.save()
-            # print('*'*60, user.avatar, "*"* 60)
-            # serializer.save
             return Response(serializer.data)
 
     @me_avatar.mapping.delete
@@ -91,13 +88,6 @@ class UserViewSet(
         user = get_object_or_404(self.queryset, username=request.user)
         user.avatar = None
         user.save()
-    #     serializer = UserAvatarSerializer(
-    #         get_object_or_404(User, email=request.user),
-    #         data=request.data,
-    #         partial=True
-    #     )
-    #     serializer.is_valid(raise_exception=True)
-    #     # serializer.save(role=request.user.role)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(
@@ -134,12 +124,15 @@ class UserViewSet(
         permission_classes=(IsAuthenticated,),
         url_path='subscribe'
     )
-    def subscribe(self, request, id=None):
+    def subscribe(self, request, pk=None):
         """Подписаться на пользователя."""
 
-        user = get_object_or_404(User, pk=id)
+        user = get_object_or_404(User, pk=pk)
         if user == request.user:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {'errors': 'Нельзя оформить подписку на себя.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
         serializer = FollowSerializer(
             user,
             data=request.data,
@@ -151,17 +144,23 @@ class UserViewSet(
             user=request.user
         )
         if not created:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {'errors': 'Вы уже подписанны на данного пользователя.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     @subscribe.mapping.delete
-    def delete_subscribe(self, request, id=None):
+    def delete_subscribe(self, request, pk=None):
         """Отписаться от пользователя."""
 
-        user = get_object_or_404(User, pk=id)
+        user = get_object_or_404(User, pk=pk)
         follow = Follow.objects.filter(following=user, user=request.user)
         if not follow.exists():
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {'errors': 'Вы не подписанны на данного пользователя.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
         follow.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 

@@ -11,6 +11,7 @@ class BaseNoRetrieveAndNoUpdataViewSet(
     mixins.DestroyModelMixin,
     viewsets.GenericViewSet
 ):
+    #
     filter_backends = (SearchFilter,)
     search_fields = ('name',)
     permission_classes = [IsAdminOrReadOnly]

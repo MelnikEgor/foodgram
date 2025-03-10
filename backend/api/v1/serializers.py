@@ -4,6 +4,7 @@ from django.contrib.auth import get_user_model
 from django.core.files.base import ContentFile
 from rest_framework import serializers
 
+# from api.v1.base_funk import check_field
 from .mixins import UserameNotMeMixin
 from foods.models import Ingredient, IngredientRecipe, Recipe, Tag
 

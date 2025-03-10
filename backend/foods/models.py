@@ -9,8 +9,6 @@ from backend.constants import (
     RECIPE_NAME_MAX_LENGTH,
     TAG_NAME_MAX_LENGTH,
     TAG_SLUG_MAX_LENGTH
-    # NAME_MAX_LENGTH,
-    # TEXT_LENGTH,
 )
 
 
@@ -119,6 +117,8 @@ class Recipe(models.Model):
 
 
 class IngredientRecipe(models.Model):
+    """Связная модель ингредиентов в рецепте."""
+
     ingredient = models.ForeignKey(
         Ingredient,
         on_delete=models.CASCADE,
@@ -142,6 +142,8 @@ class IngredientRecipe(models.Model):
 
 
 class Favorite(models.Model):
+    """Модель избранных рецептов."""
+
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE
@@ -161,6 +163,8 @@ class Favorite(models.Model):
 
 
 class ShoppingCart(models.Model):
+    """Модель карты покупок."""
+
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     recipe = models.ForeignKey(
         Recipe,

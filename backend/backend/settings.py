@@ -12,7 +12,7 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'no_secret_key')
 
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(', ')
 
-ROOT_HOST = 'fooodgram.hopto.org'
+ROOT_HOST = 'localhost:8000'  # 'fooodgram.hopto.org'
 
 # DEBUG = os.getenv('DEBUG', True) == True
 
@@ -122,15 +122,14 @@ USE_L10N = True
 
 USE_TZ = True
 
-STATIC_URL = '/static/'
-
-STATICFILES_DIRS = ((BASE_DIR / 'static/'),)
-
 AUTH_USER_MODEL = 'users.User'
+
+STATIC_URL = '/static/'
 
 STATIC_ROOT = BASE_DIR / 'collected_static'
 
 MEDIA_URL = '/media/'
+
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
@@ -138,16 +137,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # CSRF_TRUSTED_ORIGINS = 'fooodgram.hopto.org'
 
 DJOSER = {
-    'LOGIN_FIELD': 'email',
-    'SET_PASSWORD_RETYPE': True,
-    # 'SERIALIZERS': {
-    #     'current_user': 'api.v1.users.serializers.UserSerializer',
-    # },
-    'PERMISSIONS': {
-        'user': ['rest_framework.permissions.IsAuthenticatedOrReadOnly'],      # IsAuthenticatedOrReadOnly  IsAuthenticated
-        'user_list': ['rest_framework.permissions.IsAuthenticatedOrReadOnly']
-    },
-    'HIDE_USERS': False
+    'LOGIN_FIELD': 'email'
 }
 
 REST_FRAMEWORK = {
