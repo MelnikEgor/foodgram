@@ -14,7 +14,7 @@ ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(', ')
 
 ROOT_HOST = 'fooodgram.hopto.org'
 
-DEBUG = os.getenv('DEBUG', True) == True
+DEBUG = os.getenv('DEBUG', True) is True
 
 # DEBUG = True
 
