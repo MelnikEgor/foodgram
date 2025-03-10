@@ -88,7 +88,7 @@ jobs:
           tags: ${{ secrets.DOCKER_USERNAME }}/foodgram_frontend:latest
 
   build_nginx_and_push_to_docker_hub:
-    name: Push gateway Docker image to DockerHub
+    name: Push nginx Docker image to DockerHub
     runs-on: ubuntu-latest
 
     steps:
@@ -113,7 +113,7 @@ jobs:
     needs:
       - build_backend_and_push_to_docker_hub
       - build_frontend_and_push_to_docker_hub
-      - build_gateway_and_push_to_docker_hub
+      - build_nginx_and_push_to_docker_hub
 
     steps:
     - name: Checkout repo
