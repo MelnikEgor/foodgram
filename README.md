@@ -129,7 +129,7 @@ docker compose -f docker-compose.yml exec backend cp -r /app/collected_static/. 
 Перейдите в данную директорию
 
 ```
-cd kittygram
+cd foodgram
 ```
 
 В директории вам требуется создать файл `.env`, как вы уже делали в разделе **Как зпустить проект локально**.
