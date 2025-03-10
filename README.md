@@ -171,5 +171,5 @@ sudo docker compose -f docker-compose.production.yml up -d
 - PostgreSQL
 - Gunicorn
 - Nginx
-- JWT Authentication
+- Djoser
 - dotenv 
