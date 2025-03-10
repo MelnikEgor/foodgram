@@ -1,6 +1,5 @@
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
-# from djoser import views as djoser_views
 from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -20,10 +19,6 @@ User = get_user_model()
 
 
 class UserViewSet(
-    # djoser_views.UserViewSet,
-    # djoser_views.generics.CreateAPIView,
-    # djoser_views.generics.RetrieveAPIView,
-    # djoser_views.generics.ListAPIView,
     mixins.CreateModelMixin,
     mixins.ListModelMixin,
     mixins.RetrieveModelMixin,
@@ -39,15 +34,10 @@ class UserViewSet(
             return UserWriteSerializer
         return UserReadSerializer
 
-    # def get_permissions(self):
-    #     if self.action == "me":
-    #         self.permission_classes = [IsAuthenticated]
-    #     return super().get_permissions()
-
     @action(
         detail=False,
         methods=['GET'],
-        permission_classes=(IsAuthenticated, ),
+        permission_classes=(IsAuthenticated,),
         url_path='me'
     )
     def me(self, request):
@@ -75,7 +65,6 @@ class UserViewSet(
             user,
             data=request.data,
         )
-
         if serializer.is_valid(raise_exception=True):
             user.avatar = serializer.validated_data['avatar']
             user.save()
@@ -167,6 +156,7 @@ class UserViewSet(
     @action(
         detail=False,
         methods=['POST'],
+        permission_classes=(IsAuthenticated,),
         url_path='set_password'
     )
     def set_password(self, request):

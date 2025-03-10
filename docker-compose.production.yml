@@ -13,7 +13,7 @@ services:
       - pg_data:/var/lib/postgresql/data
 
   backend:
-    build: ./backend/
+    image: fuflofer/foodgram_backend
     env_file: .env
     volumes:
       - static:/backend_static
@@ -22,14 +22,13 @@ services:
       - db
 
   frontend:
-    container_name: foodgram-front
-    build: ./frontend
+    image: fuflofer/foodgram_frontend
     env_file: .env
     volumes:
       - static:/static
 
   nginx:
-    build: ./nginx/
+    image: fuflofer/foodgram_nginx
     env_file: .env
     ports:
       - 8000:80

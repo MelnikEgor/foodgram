@@ -4,7 +4,6 @@ from django.contrib.auth import get_user_model
 from django.core.files.base import ContentFile
 from rest_framework import serializers
 
-# from api.v1.base_funk import check_field
 from .mixins import UserameNotMeMixin
 from foods.models import Ingredient, IngredientRecipe, Recipe, Tag
 
@@ -76,11 +75,6 @@ class UserReadSerializer(serializers.ModelSerializer):
     def get_is_subscribed(self, obj):
         obj = obj.subscriber.all()
         return check_field(self, obj)
-        # print(self)
-        # user = self.context.get('request').user
-        # if user.is_authenticated:
-        #     return obj.subscriber.filter(user=user).exists()
-        # return False
 
 
 class RecipeShortReadSerializer(serializers.ModelSerializer):
@@ -92,13 +86,9 @@ class RecipeShortReadSerializer(serializers.ModelSerializer):
         read_only_fields = ('id', 'name', 'image', 'cooking_time')
 
 
-class FollowSerializer(UserReadSerializer):  # serializers.ModelSerializer
+class FollowSerializer(UserReadSerializer):
     """Сериализатор подписок пользователя."""
 
-    # is_subscribed = serializers.SerializerMethodField(
-    #     'get_is_subscribed',
-    #     read_only=True,
-    # )
     recipes = serializers.SerializerMethodField()
     recipes_count = serializers.ReadOnlyField(source='recipes.count')
 
@@ -139,12 +129,6 @@ class FollowSerializer(UserReadSerializer):  # serializers.ModelSerializer
         )
         return serializer.data
 
-    # def get_is_subscribed(self, obj):
-    #     user = self.context.get('request').user
-    #     if user.is_authenticated:
-    #         return obj.subscriber.filter(user=user).exists()
-    #     return False
-
 
 class PasswordSerializer(serializers.ModelSerializer):
     """Сериализатор смены пароля."""
@@ -155,7 +139,6 @@ class PasswordSerializer(serializers.ModelSerializer):
         error_messages={
             'blank': 'Новый пароль не может быть пустым.',
         },
-        # source='*'
     )
     current_password = serializers.CharField(
         write_only=True,
@@ -163,7 +146,6 @@ class PasswordSerializer(serializers.ModelSerializer):
         error_messages={
             'blank': 'Текущий пароль не может быть пустым.',
         },
-        # source='*'
     )
 
     class Meta:
@@ -326,18 +308,10 @@ class RecipeSerializer(serializers.ModelSerializer):
     def get_is_favorited(self, obj):
         obj = obj.favorites.all()
         return check_field(self, obj)
-        # user = self.context.get('request').user
-        # if user.is_authenticated:
-        #     return obj.favorites.filter(user=user).exists()
-        # return False
 
     def get_is_in_shopping_cart(self, obj):
         obj = obj.shopping_cart.all()
         return check_field(self, obj)
-        # user = self.context.get('request').user
-        # if user.is_authenticated:
-        #     return obj.shopping_cart.filter(user=user).exists()
-        # return False
 
     def create(self, validated_data):
         ingredients = validated_data.pop('ingredientrecipe_set')

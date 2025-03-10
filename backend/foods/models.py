@@ -15,13 +15,6 @@ from backend.constants import (
 User = get_user_model()
 
 
-class URLRecipe(models.Model):
-    """Модель ссылки."""
-
-    full_url = models.CharField('Полный URL.', max_length=128)
-    short_url = models.CharField('Короткий URL.', max_length=128)
-
-
 class Tag(models.Model):
     """Модель тега."""
 
@@ -109,11 +102,30 @@ class Recipe(models.Model):
     class Meta:
         verbose_name = 'рецепт'
         verbose_name_plural = 'Рецепты'
-        ordering = ('created_at',)
+        ordering = ('-created_at',)
         default_related_name = 'recipes'
 
     def __str__(self):
         return self.name[:NAME_LENGTH]
+
+
+class URLRecipe(models.Model):
+    """Модель ссылки."""
+
+    recipe = models.ForeignKey(
+        Recipe,
+        on_delete=models.CASCADE,
+        verbose_name='Рецепт'
+    )
+    full_url = models.CharField('Полный URL.', max_length=128)
+    short_url = models.CharField('Короткий URL.', max_length=128)
+
+    class Meta:
+        verbose_name = 'ссылка'
+        verbose_name_plural = 'Ссылки'
+
+    def __str__(self):
+        return self.recipe[:NAME_LENGTH]
 
 
 class IngredientRecipe(models.Model):
@@ -139,6 +151,14 @@ class IngredientRecipe(models.Model):
             ),
         ]
     )
+
+    class Meta:
+        verbose_name = 'ингредиенты в рецепте'
+        verbose_name_plural = 'Ингредиенты в рецептах'
+
+    def __str__(self):
+        return (str(self.ingredient) + ' в рецепте '
+                + str(self.recipe[:NAME_LENGTH]))
 
 
 class Favorite(models.Model):

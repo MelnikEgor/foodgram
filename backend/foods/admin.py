@@ -1,18 +1,37 @@
 from django.contrib import admin
-from .models import Favorite, Ingredient, Recipe, ShoppingCart, Tag
+from .models import (
+    Favorite,
+    Ingredient,
+    IngredientRecipe,
+    Recipe,
+    ShoppingCart,
+    Tag,
+    URLRecipe
+)
 
 
 admin.site.empty_value_display = 'Не задано'
 
 
+@admin.register(URLRecipe)
+class URLRecipeAdmin(admin.ModelAdmin):
+    list_display = (
+        'recipe',
+        'full_url',
+        'short_url'
+    )
+    search_fields = (
+        'recipe',
+        'full_url',
+    )
+
+
 @admin.register(Recipe)
 class RecipeAdmin(admin.ModelAdmin):
-    # inlines = (
-    #     TitleInline,
-    # )
     list_display = (
         'name',
-        'author'
+        'author',
+        'count_is_favorite'
     )
     search_fields = (
         'name',
@@ -25,13 +44,14 @@ class RecipeAdmin(admin.ModelAdmin):
         'name',
     )
 
+    def count_is_favorite(self, obj):
+        return obj.favorites.all().count()
+
+    count_is_favorite.short_description = 'Количество добавлений в "Избранное"'
+
 
 @admin.register(Ingredient)
 class IngredientAdmin(admin.ModelAdmin):
-    # inlines = (
-    #     TitleInline,
-    # )
-    
     list_display = (
         'name',
         'measurement_unit'
@@ -41,11 +61,20 @@ class IngredientAdmin(admin.ModelAdmin):
     )
 
 
+@admin.register(IngredientRecipe)
+class IngredientRecipeAdmin(admin.ModelAdmin):
+    list_display = (
+        'ingredient',
+        'recipe',
+        'amount'
+    )
+    search_fields = (
+        'name',
+    )
+
+
 @admin.register(Tag)
 class TagAdmin(admin.ModelAdmin):
-    # inlines = (
-    #     TitleInline,
-    # )
     list_display = (
         'name',
         'slug'
@@ -57,9 +86,6 @@ class TagAdmin(admin.ModelAdmin):
 
 @admin.register(Favorite)
 class FavoriteAdmin(admin.ModelAdmin):
-    # inlines = (
-    #     TitleInline,
-    # )
     list_display = (
         'user',
         'recipe'
@@ -75,9 +101,6 @@ class FavoriteAdmin(admin.ModelAdmin):
 
 @admin.register(ShoppingCart)
 class ShoppingCartAdmin(admin.ModelAdmin):
-    # inlines = (
-    #     TitleInline,
-    # )
     list_display = (
         'user',
         'recipe'

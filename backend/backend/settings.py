@@ -12,11 +12,11 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'no_secret_key')
 
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(', ')
 
-ROOT_HOST = 'localhost:8000'  # 'fooodgram.hopto.org'
+ROOT_HOST = 'fooodgram.hopto.org'
 
-# DEBUG = os.getenv('DEBUG', True) == True
+DEBUG = os.getenv('DEBUG', True) == True
 
-DEBUG = True
+# DEBUG = True
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -88,12 +88,12 @@ else:
         }
     }
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
 
 
 AUTH_PASSWORD_VALIDATORS = [

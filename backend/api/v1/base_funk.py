@@ -35,10 +35,3 @@ def actions_delete(request, pk, model):
         )
     object.delete()
     return Response(status=status.HTTP_204_NO_CONTENT)
-
-
-# def check_field(self, obj):
-#     user = self.context.get('request').user
-#     if user.is_authenticated:
-#         return obj.filter(user=user).exists()
-#     return False
