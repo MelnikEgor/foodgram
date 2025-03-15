@@ -1,4 +1,5 @@
 from django.contrib import admin
+
 from .models import (
     Favorite,
     Ingredient,
@@ -11,6 +12,14 @@ from .models import (
 
 
 admin.site.empty_value_display = 'Не задано'
+
+
+class IngredientRecipeInline(admin.TabularInline):
+    """Блок с формой для ингридиентов."""
+
+    model = IngredientRecipe
+    min_num = 1
+    extra = 0
 
 
 @admin.register(URLRecipe)
@@ -40,14 +49,20 @@ class RecipeAdmin(admin.ModelAdmin):
     list_filter = (
         'tags',
     )
+    filter_horizontal = (
+        'tags',
+        'ingredients'
+    )
     list_display_links = (
         'name',
     )
+    inlines = (
+        IngredientRecipeInline,
+    )
 
+    @admin.display(description='Количество добавлений в "Избранное"')
     def count_is_favorite(self, obj):
         return obj.favorites.all().count()
-
-    count_is_favorite.short_description = 'Количество добавлений в "Избранное"'
 
 
 @admin.register(Ingredient)

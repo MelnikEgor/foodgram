@@ -4,5 +4,6 @@ COPY package*.json ./
 
 COPY . .
 RUN npm install --global http-server
+# RUN npm run build
 
 CMD ["cp", "-r", "/app/build/.", "/static/"]

@@ -10,7 +10,7 @@ from backend.constants import (
 
 
 class User(AbstractUser):
-    """Кастомная модель пользователя."""
+    """Модель пользователя."""
 
     first_name = models.CharField(
         'Имя',
@@ -71,14 +71,25 @@ class Follow(models.Model):
         User,
         on_delete=models.CASCADE,
         related_name='subscriber',
-        blank=True,
-        null=True,
         verbose_name='Подписка'
     )
 
     class Meta:
         verbose_name = 'подписка'
         verbose_name_plural = 'Подписки'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['following', 'user'],
+                name='unique_subscribers_for_user'
+            )
+        ]
+
+    def clean(self):
+        self.clean_fields()
+        if self.user == self.following:
+            raise ValidationError(
+                'Нельзя подписаться на себя.'
+            )
 
     def __str__(self):
-        return (str(self.user) + ' подписан на ' + str(self.following))
+        return f'{self.user} подписан на {self.following}'

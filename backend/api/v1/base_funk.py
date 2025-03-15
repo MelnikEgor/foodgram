@@ -2,7 +2,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.response import Response
 
-from .serializers import RecipeShortReadSerializer
+from api.v1.foods.recipe_short_serializer import RecipeShortReadSerializer
 from foods.models import Recipe
 
 
@@ -35,3 +35,10 @@ def actions_delete(request, pk, model):
         )
     object.delete()
     return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+def check_field(self, obj):
+    user = self.context.get('request').user
+    if user.is_authenticated:
+        return obj.filter(user=user).exists()
+    return False

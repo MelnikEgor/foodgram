@@ -11,14 +11,14 @@ from rest_framework.response import Response
 
 from .base_views import ListRetrieveViewSet
 from .filters import RecipeFilter
-from api.v1.base_funk import actions_delete, actions_for_view
-from api.v1.mixins import CastomUpdateModelMixin
-from api.v1.permissions import IsAuthorOrReadOnly
-from api.v1.serializers import (
+from .serializers import (
     IngredientSerializer,
     RecipeSerializer,
     TagSerializer
 )
+from api.v1.base_funk import actions_delete, actions_for_view
+from api.v1.mixins import CustomUpdateModelMixin
+from api.v1.permissions import IsAuthorOrReadOnly
 from backend.constants import SHORT_URL_LENGTH
 from backend.settings import ROOT_HOST
 from foods.models import (
@@ -55,7 +55,7 @@ class RecipeViewSet(
     mixins.ListModelMixin,
     mixins.DestroyModelMixin,
     mixins.RetrieveModelMixin,
-    CastomUpdateModelMixin,
+    CustomUpdateModelMixin,
     viewsets.GenericViewSet
 ):
     """Представление рецепта."""

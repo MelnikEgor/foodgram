@@ -13,12 +13,10 @@ class UserAdmin(BaseUserAdmin):
         'last_name',
         'is_staff',
     )
-
     search_fields = (
         'email',
         'username'
     )
-
     fieldsets = BaseUserAdmin.fieldsets + (
         (None, {'fields': ['avatar']}),
     )

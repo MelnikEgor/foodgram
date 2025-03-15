@@ -12,7 +12,7 @@ class UserameNotMeMixin:
         return value
 
 
-class CastomUpdateModelMixin:
+class CustomUpdateModelMixin:
     """Миксин для обновления данных без PUT метода."""
 
     def update(self, request, *args, **kwargs):

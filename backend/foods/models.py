@@ -26,8 +26,7 @@ class Tag(models.Model):
     slug = models.SlugField(
         'Слаг',
         max_length=TAG_SLUG_MAX_LENGTH,
-        unique=True,
-        null=True
+        unique=True
     )
 
     class Meta:
@@ -53,6 +52,12 @@ class Ingredient(models.Model):
     class Meta:
         verbose_name = 'ингридиент'
         verbose_name_plural = 'Ингридиенты'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['measurement_unit', 'name'],
+                name='unique_ingredient'
+            )
+        ]
 
     def __str__(self):
         return self.name[:NAME_LENGTH]
@@ -94,9 +99,8 @@ class Recipe(models.Model):
         verbose_name='Добавлено'
     )
     image = models.ImageField(
-        upload_to='recipes/images/',
-        null=True,
-        default=None
+        'Изображение',
+        upload_to='recipes/images/'
     )
 
     class Meta:
@@ -135,12 +139,11 @@ class IngredientRecipe(models.Model):
         Ingredient,
         on_delete=models.CASCADE,
         verbose_name='Ингредиент',
-        related_name='ingredient_count'
     )
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
-        verbose_name='Рецепт'
+        verbose_name='Рецепт',
     )
     amount = models.PositiveSmallIntegerField(
         'Количество',
@@ -155,48 +158,58 @@ class IngredientRecipe(models.Model):
     class Meta:
         verbose_name = 'ингредиенты в рецепте'
         verbose_name_plural = 'Ингредиенты в рецептах'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['recipe', 'ingredient'],
+                name='unique_ingredient_for_recipe'
+            )
+        ]
 
     def __str__(self):
-        return (str(self.ingredient) + ' в рецепте '
-                + str(self.recipe[:NAME_LENGTH]))
+        return f'{self.recipe}'
 
 
-class Favorite(models.Model):
+class RecipesIn(models.Model):
+    """Модель карты покупок."""
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
+
+    class Meta:
+        abstract = True
+
+
+class Favorite(RecipesIn):
     """Модель избранных рецептов."""
-
-    user = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE
-    )
-    recipe = models.ForeignKey(
-        Recipe,
-        on_delete=models.CASCADE,
-    )
 
     class Meta:
         verbose_name = 'избраное'
         verbose_name_plural = 'Избраное'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['recipe', 'user'],
+                name='unique_favorite_recipe'
+            )
+        ]
         default_related_name = 'favorites'
 
     def __str__(self):
-        return (str(self.recipe) + ' избранный рецепт ' + str(self.user))
+        return f'{self.recipe} избранный рецепт {self.user}'
 
 
-class ShoppingCart(models.Model):
+class ShoppingCart(RecipesIn):
     """Модель карты покупок."""
-
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    recipe = models.ForeignKey(
-        Recipe,
-        on_delete=models.CASCADE,
-    )
 
     class Meta:
         verbose_name = 'список покупок'
         verbose_name_plural = 'Списки покупок'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['recipe', 'user'],
+                name='unique_recipe_in_shopping_card'
+            )
+        ]
         default_related_name = 'shopping_cart'
 
     def __str__(self):
-        return (
-            str(self.recipe) + ' рецепт в списке покупок у ' + str(self.user)
-        )
+        return f'{self.recipe} рецепт в списке покупок у {self.user}'
