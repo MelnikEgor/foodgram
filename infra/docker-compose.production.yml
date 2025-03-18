@@ -7,14 +7,14 @@ volumes:
 
 services:
   db:
-    container_name: db
+    container_name: foodgram-db
     image: postgres:13
     env_file: ../.env
     volumes:
       - pg_data:/var/lib/postgresql/data
   backend:
+    container_name: foodgram-backend
     image: fuflofer/foodgram_backend
-    # container_name: foodgram-back
     # build: ../backend/
     env_file: ../.env
     volumes:
