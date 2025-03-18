@@ -14,9 +14,9 @@ ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(', ')
 
 ROOT_HOST = 'fooodgram.hopto.org'
 
-DEBUG = os.getenv('DEBUG', True) is True
+# DEBUG = os.getenv('DEBUG', True) is True
 
-# DEBUG = True
+DEBUG = True
 
 DJANGO_SUPERUSER_EMAIL = 'admin@lst.net'
 DJANGO_SUPERUSER_USERNAME = 'admin'
@@ -101,7 +101,7 @@ else:
 #     }
 # }
 
-# CSRF_TRUSTED_ORIGINS = 'localhost'  # 'fooodgram.hopto.org'
+CSRF_TRUSTED_ORIGINS = 'fooodgram.hopto.org'
 
 AUTH_PASSWORD_VALIDATORS = [
     {
