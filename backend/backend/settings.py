@@ -14,9 +14,9 @@ ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(', ')
 
 ROOT_HOST = 'fooodgram.hopto.org'
 
-# DEBUG = os.getenv('DEBUG', True) is True
+DEBUG = os.getenv('DEBUG', True) is True
 
-DEBUG = True
+# DEBUG = True
 
 DJANGO_SUPERUSER_EMAIL = 'admin@lst.net'
 DJANGO_SUPERUSER_USERNAME = 'admin'
@@ -74,32 +74,32 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 
 
 DEFAULT_DBMS = 'django.db.backends.sqlite3'
-# DBMS_USING = os.getenv('DBMS_POSTGRES', DEFAULT_DBMS)
-# if DBMS_USING == DEFAULT_DBMS:
-#     DATABASES = {
-#         'default': {
-#             'ENGINE': DBMS_USING,
-#             'NAME': BASE_DIR / 'db.sqlite3',
-#         }
-#     }
-# else:
-#     DATABASES = {
-#         'default': {
-#             'ENGINE': DBMS_USING,
-#             'NAME': os.getenv('POSTGRES_DB', 'django'),
-#             'USER': os.getenv('POSTGRES_USER', 'django'),
-#             'PASSWORD': os.getenv('POSTGRES_PASSWORD', ''),
-#             'HOST': os.getenv('DB_HOST', ''),
-#             'PORT': os.getenv('DB_PORT', 5432)
-#         }
-#     }
-
-DATABASES = {
-    'default': {
-        'ENGINE': DEFAULT_DBMS,
-        'NAME': BASE_DIR / 'db.sqlite3',
+DBMS_USING = os.getenv('DBMS_POSTGRES', DEFAULT_DBMS)
+if DBMS_USING == DEFAULT_DBMS:
+    DATABASES = {
+        'default': {
+            'ENGINE': DBMS_USING,
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': DBMS_USING,
+            'NAME': os.getenv('POSTGRES_DB', 'django'),
+            'USER': os.getenv('POSTGRES_USER', 'django'),
+            'PASSWORD': os.getenv('POSTGRES_PASSWORD', ''),
+            'HOST': os.getenv('DB_HOST', ''),
+            'PORT': os.getenv('DB_PORT', 5432)
+        }
+    }
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': DEFAULT_DBMS,
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
 
 # CSRF_TRUSTED_ORIGINS = 'localhost'  # 'fooodgram.hopto.org'
 
