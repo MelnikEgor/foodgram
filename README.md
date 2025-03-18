@@ -108,18 +108,17 @@ docker compose -f docker-compose.yml up --build
 > * `<команда>` - указывается команда, которую требуется выполнить.
 
 ```
-docker compose -f docker-compose.yml exec backend python manage.py migrate
-docker compose -f docker-compose.yml exec backend python manage.py collectstatic
-docker compose -f docker-compose.yml exec backend cp -r /app/collected_static/. /backend_static/static/
+docker compose -f docker-compose.yml exec backend python manage.py load_data - для загрузки данных ингредиентов.
+docker compose -f docker-compose.production.yml exec backend python manage.py createsuperuser - для создания суперпользователя.
 ```
 
-Можете проверить работу по `localhost:8000` в браузере.
+Можете проверить работу по `localhost:8080` в браузере.
 
 Также осуществить локальный запуск возможно другим способом. Он похож на способ запуска на сервере, за исключением некоторых шагов, расмотрим их в пункте **Как запустить проект на сервере**.
 
 ## Как запустить проект на сервере:
 
-На сервере должен быть установле `Nginx`, в конфигурации требуется настроить перенаправления 80 порта на 8000.
+На сервере должен быть установле `Nginx`, в конфигурации требуется настроить перенаправления 80 порта на 8080.
 
 Подключаетесь к серверу.
 
@@ -154,7 +153,22 @@ sudo docker compose -f docker-compose.production.yml up -d
 > * `docker compose down` — остановит все контейнеры, удалит их, сети и анонимные volumes. Можно будет начать всё заново.
 > * `docker compose logs` — просмотр логов запущенных контейнеров.
 
-Если проект разворачивался локально, то проверьте доступ по `localhost:8000` в браузере.
+В терминале потребуется выполнить команды перед началом работы.
+
+> [!IMPORTANT]
+> docker compose -f <имя_файла> exec <имя_контейнера> <команда>
+> * `exec <имя_контейнера>` - указывает, что требуется выполнить в терминале в нутри контейнера, указанную команду.
+> * `<команда>` - указывается команда, которую требуется выполнить.
+
+```
+docker compose -f docker-compose.production.yml exec backend python manage.py load_data - для загрузки данных ингредиентов.
+docker compose -f docker-compose.production.yml exec backend python manage.py createsuperuser - для создания суперпользователя.
+__Если делаете это на сервере, то придумывайте сложный пароль__.
+```
+
+После создания суперпользователя, вам потребуется создать собственные __Теги__, после чего, сайт будет полноценно рабочим.
+
+Если проект разворачивался локально, то проверьте доступ по `localhost:8080` в браузере.
 Если проект разворачивался на удаленном сервере, то доусп осуществляется по вашему домену `https:/<имя_домена>/`.
 
 

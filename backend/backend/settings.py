@@ -14,9 +14,7 @@ ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(', ')
 
 ROOT_HOST = 'fooodgram.hopto.org'
 
-# DEBUG = os.getenv('DEBUG', True) is True
-
-DEBUG = True
+DEBUG = os.getenv('DEBUG', True) is True
 
 DJANGO_SUPERUSER_EMAIL = 'admin@lst.net'
 DJANGO_SUPERUSER_USERNAME = 'admin'
@@ -94,13 +92,6 @@ else:
         }
     }
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': DEFAULT_DBMS,
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
-
 CSRF_TRUSTED_ORIGINS = 'fooodgram.hopto.org'
 
 AUTH_PASSWORD_VALIDATORS = [
@@ -117,7 +108,6 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-
 
 LANGUAGE_CODE = 'ru-RU'
 
