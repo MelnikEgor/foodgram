@@ -145,7 +145,6 @@ REST_FRAMEWORK = {
     ],
 
     'DEFAULT_PAGINATION_CLASS': 'api.v1.pagination.CustomPagination',
-    'PAGE_SIZE': 6,
 
     'SEARCH_PARAM': 'name'
 }

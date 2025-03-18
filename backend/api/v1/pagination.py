@@ -1,15 +1,11 @@
 from rest_framework.pagination import PageNumberPagination
 
+from backend.constants import PAGE_SIZE
+
 
 class CustomPagination(PageNumberPagination):
     """Кастомная пагинация."""
 
-    def paginate_queryset(self, queryset, request, view=None):
-        limit = request.query_params.get('limit')
-        if limit:
-            try:
-                limit = int(limit)
-                queryset = queryset[:limit]
-            except ValueError:
-                pass
-        return super().paginate_queryset(queryset, request, view)
+    page_size = PAGE_SIZE
+    page_size_query_param = 'limit'
+    max_page_size = page_size
