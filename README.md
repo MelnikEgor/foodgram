@@ -109,6 +109,7 @@ docker compose -f docker-compose.yml up --build
 > * `<команда>` - указывается команда, которую требуется выполнить.
 
 ```
+docker compose -f docker-compose.production.yml exec backend python manage.py load_data - для загрузки данных ингредиентов.
 docker compose -f docker-compose.production.yml exec backend python manage.py createsuperuser - для создания суперпользователя.
 ```
 
@@ -161,6 +162,7 @@ sudo docker compose -f docker-compose.production.yml up -d
 > * `<команда>` - указывается команда, которую требуется выполнить.
 
 ```
+docker compose -f docker-compose.production.yml exec backend python manage.py load_data - для загрузки данных ингредиентов.
 docker compose -f docker-compose.production.yml exec backend python manage.py createsuperuser - для создания суперпользователя.
 __Если делаете это на сервере, то придумывайте сложный пароль__.
 ```
