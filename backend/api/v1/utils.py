@@ -6,7 +6,7 @@ from api.v1.foods.recipe_short_serializer import RecipeShortReadSerializer
 from foods.models import Recipe
 
 
-def actions_for_view(request, pk, model):
+def actions_add(request, pk, model):
     recipe = get_object_or_404(Recipe, pk=pk)
     serializer = RecipeShortReadSerializer(recipe, data=request.data)
     serializer.is_valid(raise_exception=True)
@@ -24,21 +24,18 @@ def actions_for_view(request, pk, model):
 
 def actions_delete(request, pk, model):
     recipe = get_object_or_404(Recipe, pk=pk)
-    object = model.objects.filter(
+    count_object = model.objects.filter(
         recipe=recipe,
         user=request.user
-    )
-    if not object.exists():
+    ).delete()[0]
+    if not count_object:
         return Response(
             {'errors': 'Рецепт уже удален.'},
             status=status.HTTP_400_BAD_REQUEST
         )
-    object.delete()
     return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 def check_field(self, obj):
     user = self.context.get('request').user
-    if user.is_authenticated:
-        return obj.filter(user=user).exists()
-    return False
+    return user.is_authenticated and obj.filter(user=user).exists()

@@ -27,12 +27,13 @@ class UserViewSet(
     """Представление пользователя."""
 
     queryset = User.objects.all()
+    serializer_class = UserReadSerializer
     permission_classes = (AllowAny,)
 
     def get_serializer_class(self):
         if self.action in ['create']:
             return UserWriteSerializer
-        return UserReadSerializer
+        return super().get_serializer_class()
 
     @action(
         detail=False,
@@ -46,7 +47,7 @@ class UserViewSet(
         serializer = UserReadSerializer(
             request.user,
             data=request.data,
-            context={'request': request}
+            context=self.get_serializer_context()
         )
         serializer.is_valid(raise_exception=True)
         return Response(serializer.data)
@@ -97,13 +98,13 @@ class UserViewSet(
             serializer = FollowSerializer(
                 page,
                 many=True,
-                context={'request': request}
+                context=self.get_serializer_context()
             )
             return self.get_paginated_response(serializer.data)
         serializer = FollowSerializer(
             users,
             many=True,
-            context={'request': request}
+            context=self.get_serializer_context()
         )
         return Response(serializer.data)
 
@@ -125,7 +126,7 @@ class UserViewSet(
         serializer = FollowSerializer(
             user,
             data=request.data,
-            context={'request': request}
+            context=self.get_serializer_context()
         )
         serializer.is_valid(raise_exception=True)
         obj, created = Follow.objects.get_or_create(
@@ -170,8 +171,7 @@ class UserViewSet(
             return Response(
                 status=status.HTTP_204_NO_CONTENT
             )
-        else:
-            return Response(
-                serializer.errors,
-                status=status.HTTP_400_BAD_REQUEST
-            )
+        return Response(
+            serializer.errors,
+            status=status.HTTP_400_BAD_REQUEST
+        )

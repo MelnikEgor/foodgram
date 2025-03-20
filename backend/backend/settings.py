@@ -12,15 +12,9 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'no_secret_key')
 
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(', ')
 
-ROOT_HOST = 'fooodgram.hopto.org'
+ROOT_HOST = os.getenv('ROOT_HOST', 'localhost')
 
 DEBUG = os.getenv('DEBUG', True) is True
-
-DJANGO_SUPERUSER_EMAIL = 'admin@lst.net'
-DJANGO_SUPERUSER_USERNAME = 'admin'
-DJANGO_SUPERUSER_FIRST_NAME = 'admin'
-DJANGO_SUPERUSER_LAST_NAME = 'admin'
-DJANGO_SUPERUSER_PASSWORD = 'admin'
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -92,7 +86,7 @@ else:
         }
     }
 
-CSRF_TRUSTED_ORIGINS = 'fooodgram.hopto.org'
+CSRF_TRUSTED_ORIGINS = os.getenv('CSRF_TRUSTED_ORIGINS', 'localhost')
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -144,7 +138,7 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.TokenAuthentication',
     ],
 
-    'DEFAULT_PAGINATION_CLASS': 'api.v1.pagination.CustomPagination',
+    'DEFAULT_PAGINATION_CLASS': 'api.v1.paginators.CustomPagination',
 
     'SEARCH_PARAM': 'name'
 }

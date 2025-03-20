@@ -24,7 +24,7 @@ class RecipeFilter(filters_dj.FilterSet):
     def filter_is_in_shopping_cart(self, queryset, name, value):
         user = self.request.user
         if user.is_authenticated and value:
-            return queryset.filter(shopping_cart__user=user)
+            return queryset.filter(shopping_carts__user=user)
         return queryset
 
     class Meta:

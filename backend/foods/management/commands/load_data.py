@@ -10,12 +10,12 @@ class Command(BaseCommand):
         try:
             with open('data/ingredients.json', 'rb') as file:
                 ingredients_data = json.load(file)
-                ingredients = Ingredient.objects.bulk_create(
+                Ingredient.objects.bulk_create(
                     Ingredient(**ingredient) for ingredient in ingredients_data
                 )
                 self.stdout.write(
                     self.style.SUCCESS(
-                        f'Успешно импортировано {len(ingredients)}.'
+                        f'Успешно импортировано {Ingredient.objects.count()}.'
                     )
                 )
         except Exception as e:

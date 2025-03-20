@@ -1,7 +1,7 @@
 import hashlib
 
 from django.contrib.auth import get_user_model
-from django.http import HttpResponse
+from django.db.models import Sum
 from django.shortcuts import get_object_or_404, redirect
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, mixins, viewsets
@@ -13,12 +13,14 @@ from .base_views import ListRetrieveViewSet
 from .filters import RecipeFilter
 from .serializers import (
     IngredientSerializer,
-    RecipeSerializer,
+    RecipeReadSerializer,
+    RecipeWriteSerializer,
     TagSerializer
 )
-from api.v1.base_funk import actions_delete, actions_for_view
+from .utils import shopping_cart
 from api.v1.mixins import CustomUpdateModelMixin
 from api.v1.permissions import IsAuthorOrReadOnly
+from api.v1.utils import actions_delete, actions_add
 from backend.constants import SHORT_URL_LENGTH
 from backend.settings import ROOT_HOST
 from foods.models import (
@@ -61,7 +63,7 @@ class RecipeViewSet(
     """Представление рецепта."""
 
     queryset = Recipe.objects.all()
-    serializer_class = RecipeSerializer
+    serializer_class = RecipeReadSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = RecipeFilter
     permission_classes = [IsAuthorOrReadOnly]
@@ -70,6 +72,11 @@ class RecipeViewSet(
         if self.action == "create":
             self.permission_classes = [IsAuthenticated]
         return super().get_permissions()
+
+    def get_serializer_class(self):
+        if self.action in ['create', 'partial_update']:
+            return RecipeWriteSerializer
+        return super().get_serializer_class()
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
@@ -83,7 +90,7 @@ class RecipeViewSet(
     def favorite(self, request, pk=None):
         """Добавление рецепта в избранное."""
 
-        return actions_for_view(request, pk, Favorite)
+        return actions_add(request, pk, Favorite)
 
     @favorite.mapping.delete
     def delete_favorite(self, request, pk=None):
@@ -99,23 +106,15 @@ class RecipeViewSet(
     def download_shopping_cart(self, request):
         """Скачивание карты покупок с необходимыми ингредиентами."""
 
-        shopping = 'Список покупок:\n'
-        shopping_cart = {}
-        user = get_object_or_404(User, username=request.user)
-        recipes_data = user.shopping_cart.all()
-        for recipe_data in recipes_data:
-            recipe_obj = recipe_data.recipe
-            for ingredient_data in recipe_obj.ingredientrecipe_set.all():
-                product = (ingredient_data.ingredient.name + ' ('
-                           + ingredient_data.ingredient.measurement_unit + ')')
-                if product not in shopping_cart.keys():
-                    shopping_cart[product] = 0
-                shopping_cart[product] += ingredient_data.amount
-        for name_ingredient, amount_ingredient in shopping_cart.items():
-            shopping += f'- {name_ingredient}: {amount_ingredient}\n'
-        response = HttpResponse(shopping, content_type='text/plain')
-        response['Content-Disposition'] = 'attachment; filename="shopping.txt"'
-        return response
+        ingredients = User.objects.filter(
+            username=request.user
+        ).values_list(
+            'shopping_carts__recipe__ingredients__name',
+            'shopping_carts__recipe__ingredients__measurement_unit'
+        ).annotate(
+            amount=Sum('shopping_carts__recipe__ingredientrecipe__amount')
+        )
+        return shopping_cart(ingredients)
 
     @action(
         detail=True,
@@ -126,7 +125,7 @@ class RecipeViewSet(
     def shopping_cart(self, request, pk=None):
         """Добавление рецепта в карту покупок."""
 
-        return actions_for_view(request, pk, ShoppingCart)
+        return actions_add(request, pk, ShoppingCart)
 
     @shopping_cart.mapping.delete
     def delete_shopping_cart(self, request, pk=None):

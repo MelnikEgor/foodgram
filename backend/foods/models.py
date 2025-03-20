@@ -172,8 +172,16 @@ class IngredientRecipe(models.Model):
 class RecipesIn(models.Model):
     """Модель карты покупок."""
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        verbose_name='Пользователь'
+    )
+    recipe = models.ForeignKey(
+        Recipe,
+        on_delete=models.CASCADE,
+        verbose_name='Рецепт'
+    )
 
     class Meta:
         abstract = True
@@ -209,7 +217,7 @@ class ShoppingCart(RecipesIn):
                 name='unique_recipe_in_shopping_card'
             )
         ]
-        default_related_name = 'shopping_cart'
+        default_related_name = 'shopping_carts'
 
     def __str__(self):
         return f'{self.recipe} рецепт в списке покупок у {self.user}'

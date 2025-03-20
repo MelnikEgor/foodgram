@@ -1,10 +1,10 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
-from api.v1.base_funk import check_field
-from api.v1.custom_image_field import Base64ImageField
+from api.v1.fields import Base64ImageField
 from api.v1.foods.recipe_short_serializer import RecipeShortReadSerializer
 from api.v1.mixins import UserameNotMeMixin
+from api.v1.utils import check_field
 
 
 User = get_user_model()

@@ -90,9 +90,10 @@ git clone https://github.com/MelnikEgor/foodgram.git
 
 Создайте файл `.env` по примеру `.env.example`.
 
-Выполните команду:
+Выполните последовательно команды:
 
 ```
+cd infra
 docker compose -f docker-compose.yml up --build
 ```
 * `docker compose` - команда указывающая, что работаем с __оркестром__ контейнеров.
@@ -108,7 +109,6 @@ docker compose -f docker-compose.yml up --build
 > * `<команда>` - указывается команда, которую требуется выполнить.
 
 ```
-docker compose -f docker-compose.yml exec backend python manage.py load_data - для загрузки данных ингредиентов.
 docker compose -f docker-compose.production.yml exec backend python manage.py createsuperuser - для создания суперпользователя.
 ```
 
@@ -134,7 +134,7 @@ cd foodgram
 ```
 
 В директории вам требуется создать файл `.env`, как вы уже делали в разделе **Как зпустить проект локально**.
-Также в данную директорию требуется скопировать файл `docker-compose.production.yml`, который лежит в корневой директории проекта на локальной машине.
+Далее требуется создать новую директорию `infra` и скопировать в нее файл `docker-compose.production.yml`, который лежит в корневой директории проекта на локальной машине.
 
 После того, как все файлы созданы, выполняете команду:
 
@@ -161,7 +161,6 @@ sudo docker compose -f docker-compose.production.yml up -d
 > * `<команда>` - указывается команда, которую требуется выполнить.
 
 ```
-docker compose -f docker-compose.production.yml exec backend python manage.py load_data - для загрузки данных ингредиентов.
 docker compose -f docker-compose.production.yml exec backend python manage.py createsuperuser - для создания суперпользователя.
 __Если делаете это на сервере, то придумывайте сложный пароль__.
 ```
