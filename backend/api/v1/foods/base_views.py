@@ -7,4 +7,5 @@ class ListRetrieveViewSet(
     viewsets.GenericViewSet
 ):
     """Базовый ViewSet, только для просмотра информации."""
+
     pagination_class = None

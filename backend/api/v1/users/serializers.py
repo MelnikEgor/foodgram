@@ -2,8 +2,8 @@ from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
 from api.v1.fields import Base64ImageField
-from api.v1.foods.recipe_short_serializer import RecipeShortReadSerializer
 from api.v1.mixins import UserameNotMeMixin
+from api.v1.serializers import RecipeShortReadSerializer
 from api.v1.utils import check_field
 
 
@@ -61,7 +61,7 @@ class UserReadSerializer(serializers.ModelSerializer):
         )
 
     def get_is_subscribed(self, obj):
-        obj = obj.subscriber.all()
+        obj = obj.subscribers.all()
         return check_field(self, obj)
 
 
@@ -90,6 +90,19 @@ class FollowSerializer(UserReadSerializer):
             'first_name',
             'last_name'
         )
+
+    def validate(self, data):
+        user = self.context['request'].user
+        follow = user.followers.filter(following=self.instance)
+        if self.instance == user:
+            raise serializers.ValidationError(
+                'Нельзя оформить подписку на себя.'
+            )
+        elif follow.exists():
+            raise serializers.ValidationError(
+                'Вы уже подписанны на данного пользователя.'
+            )
+        return data
 
     def get_recipes(self, obj):
         request = self.context.get('request')

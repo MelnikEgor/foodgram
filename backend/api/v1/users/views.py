@@ -33,7 +33,14 @@ class UserViewSet(
     def get_serializer_class(self):
         if self.action in ['create']:
             return UserWriteSerializer
+        elif self.action in ['subscriptions']:
+            return FollowSerializer
         return super().get_serializer_class()
+
+    def get_queryset(self):
+        if self.action in ['subscriptions']:
+            return User.objects.filter(subscribers__user=self.request.user)
+        return super().get_queryset()
 
     @action(
         detail=False,
@@ -43,7 +50,6 @@ class UserViewSet(
     )
     def me(self, request):
         """Получить свою страницу."""
-
         serializer = UserReadSerializer(
             request.user,
             data=request.data,
@@ -60,22 +66,20 @@ class UserViewSet(
     )
     def me_avatar(self, request):
         """Добавление автара пользователю."""
-
-        user = get_object_or_404(self.queryset, username=request.user)
+        user = request.user
         serializer = UserAvatarSerializer(
             user,
             data=request.data,
         )
-        if serializer.is_valid(raise_exception=True):
-            user.avatar = serializer.validated_data['avatar']
-            user.save()
-            return Response(serializer.data)
+        serializer.is_valid(raise_exception=True)
+        user.avatar = serializer.validated_data['avatar']
+        user.save()
+        return Response(serializer.data)
 
     @me_avatar.mapping.delete
     def delete_me_avatar(self, request):
         """Удаление аватара у пользователя."""
-
-        user = get_object_or_404(self.queryset, username=request.user)
+        user = request.user
         user.avatar = None
         user.save()
         return Response(status=status.HTTP_204_NO_CONTENT)
@@ -88,25 +92,7 @@ class UserViewSet(
     )
     def subscriptions(self, request):
         """Получения списка подписок."""
-
-        subscribers = []
-        for follower in request.user.followers.all():
-            subscribers.append(follower.following)
-        users = User.objects.filter(username__in=subscribers)
-        page = self.paginate_queryset(users)
-        if page is not None:
-            serializer = FollowSerializer(
-                page,
-                many=True,
-                context=self.get_serializer_context()
-            )
-            return self.get_paginated_response(serializer.data)
-        serializer = FollowSerializer(
-            users,
-            many=True,
-            context=self.get_serializer_context()
-        )
-        return Response(serializer.data)
+        return self.list(request)
 
     @action(
         detail=True,
@@ -116,42 +102,31 @@ class UserViewSet(
     )
     def subscribe(self, request, pk=None):
         """Подписаться на пользователя."""
-
         user = get_object_or_404(User, pk=pk)
-        if user == request.user:
-            return Response(
-                {'errors': 'Нельзя оформить подписку на себя.'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
         serializer = FollowSerializer(
             user,
             data=request.data,
             context=self.get_serializer_context()
         )
         serializer.is_valid(raise_exception=True)
-        obj, created = Follow.objects.get_or_create(
+        obj, _ = Follow.objects.get_or_create(
             following=user,
             user=request.user
         )
-        if not created:
-            return Response(
-                {'errors': 'Вы уже подписанны на данного пользователя.'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     @subscribe.mapping.delete
     def delete_subscribe(self, request, pk=None):
         """Отписаться от пользователя."""
-
         user = get_object_or_404(User, pk=pk)
-        follow = Follow.objects.filter(following=user, user=request.user)
-        if not follow.exists():
+        coun_object, _ = Follow.objects.filter(
+            following=user, user=request.user
+        ).delete()
+        if not coun_object:
             return Response(
                 {'errors': 'Вы не подписанны на данного пользователя.'},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        follow.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(
@@ -162,16 +137,11 @@ class UserViewSet(
     )
     def set_password(self, request):
         """Смена пароля."""
-
-        user = get_object_or_404(User, username=request.user)
+        user = request.user
         serializer = PasswordSerializer(user, data=request.data)
-        if serializer.is_valid(raise_exception=True):
-            user.set_password(serializer.validated_data['new_password'])
-            user.save()
-            return Response(
-                status=status.HTTP_204_NO_CONTENT
-            )
+        serializer.is_valid(raise_exception=True)
+        user.set_password(serializer.validated_data['new_password'])
+        user.save()
         return Response(
-            serializer.errors,
-            status=status.HTTP_400_BAD_REQUEST
+            status=status.HTTP_204_NO_CONTENT
         )

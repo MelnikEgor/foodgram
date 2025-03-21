@@ -4,8 +4,16 @@ from rest_framework import serializers
 from .utils import add_ingredients
 from api.v1.fields import Base64ImageField
 from api.v1.users.serializers import UserReadSerializer
+from api.v1.serializers import RecipeShortReadSerializer
 from api.v1.utils import check_field
-from foods.models import Ingredient, IngredientRecipe, Recipe, Tag
+from foods.models import (
+    Favorite,
+    Ingredient,
+    IngredientRecipe,
+    Recipe,
+    ShoppingCart,
+    Tag
+)
 
 
 User = get_user_model()
@@ -188,9 +196,36 @@ class RecipeWriteSerializer(RecipeReadSerializer):
     def update(self, instance, validated_data):
         ingredients = validated_data.pop('ingredientrecipe_set', None)
         tags = validated_data.pop('tags', None)
-        super().update(instance, validated_data)
         instance.tags.set(tags)
         instance.ingredientrecipe_set.all().delete()
         add_ingredients(instance, ingredients)
-        instance.save()
-        return instance
+        return super().update(instance, validated_data)
+
+
+class FavoriteAndShoppingCartSerializer(serializers.ModelSerializer):
+    class Meta:
+        fields = ('recipe', 'user')
+
+    def to_representation(self, instance):
+        return RecipeShortReadSerializer().to_representation(
+            instance.get('recipe')
+        )
+
+    def validate(self, data):
+        recipe = data.get('recipe')
+        user = data.get('user')
+        if self.Meta.model.objects.filter(user=user, recipe=recipe).exists():
+            raise serializers.ValidationError(
+                'Рецепт уже добален.'
+            )
+        return data
+
+
+class FavoreteSerializer(FavoriteAndShoppingCartSerializer):
+    class Meta(FavoriteAndShoppingCartSerializer.Meta):
+        model = Favorite
+
+
+class ShoppingCartSerializer(FavoriteAndShoppingCartSerializer):
+    class Meta(FavoriteAndShoppingCartSerializer.Meta):
+        model = ShoppingCart
